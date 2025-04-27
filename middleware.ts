@@ -18,7 +18,19 @@ export default authMiddleware({
   // no authentication information
   ignoredRoutes: [
     "/api/tools/(.*)/reviews"
-  ]
+  ],
+  // Add debug mode to help diagnose issues
+  debug: true,
+  // Handle token expiration
+  afterAuth: (auth, req) => {
+    // If the token is expired, redirect to sign-in
+    if (auth.sessionId && !auth.session) {
+      const signInUrl = new URL('/sign-in', req.url);
+      signInUrl.searchParams.set('redirect_url', req.url);
+      return Response.redirect(signInUrl);
+    }
+    return null;
+  }
 });
 
 export const config = {
