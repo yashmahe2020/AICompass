@@ -1,0 +1,201 @@
+{
+  "canva": {
+    "name": "Canva",
+    "reviews": [
+      {
+        "review": "Canva has revolutionized how I create teaching materials. The AI features like Magic Write and Magic Design save me hours of work. I can quickly generate lesson plans, worksheets, and presentations that look professional. The education templates are perfect for my classroom needs.",
+        "authorName": "Sarah Johnson",
+        "date": "2024-02-15",
+        "stars": 5
+      },
+      {
+        "review": "The AI image generation in Canva is a game-changer for creating custom visuals for my lessons. I can create diagrams, illustrations, and even character images that perfectly match my teaching content. The collaboration features also make it easy to work with colleagues on shared resources.",
+        "authorName": "Michael Chen",
+        "date": "2024-01-28",
+        "stars": 5
+      },
+      {
+        "review": "Canva's AI features are impressive, but they can be inconsistent. Sometimes the Magic Write generates content that needs significant editing, and the image generation occasionally produces inappropriate or irrelevant results. Still, it's a valuable tool for creating engaging materials quickly.",
+        "authorName": "Emily Rodriguez",
+        "date": "2024-02-10",
+        "stars": 4
+      },
+      {
+        "review": "I use Canva daily for creating classroom materials. The AI-powered design suggestions are helpful when I'm stuck for ideas, and the brand kit feature ensures all my materials have a consistent look. The free version is quite limited, but the education plan is worth the investment.",
+        "authorName": "David Wilson",
+        "date": "2023-12-20",
+        "stars": 4
+      },
+      {
+        "review": "While Canva's AI features are impressive, I find they work best for simple designs. For more complex educational materials, I often need to make significant adjustments. The collaboration features are excellent for team projects, and the ability to share templates with my department has been valuable.",
+        "authorName": "Lisa Thompson",
+        "date": "2024-01-05",
+        "stars": 4
+      }
+    ]
+  },
+  "notebook": {
+    "name": "Google Notebook",
+    "reviews": [
+      {
+        "review": "Google Notebook has transformed how I organize my teaching resources. The AI-powered search and organization features help me quickly find materials I've saved, even if I can't remember exactly where I put them. The ability to collaborate with colleagues on shared notebooks has improved our resource sharing significantly.",
+        "authorName": "Jennifer Martinez",
+        "date": "2024-02-15",
+        "stars": 5
+      },
+      {
+        "review": "The AI summarization feature in Google Notebook is excellent for quickly processing research articles and educational content. I can save lengthy resources and have the AI generate concise summaries, saving me valuable time. The integration with other Google tools makes it seamless to use in my workflow.",
+        "authorName": "Robert Taylor",
+        "date": "2024-01-28",
+        "stars": 4
+      },
+      {
+        "review": "Google Notebook is a solid tool for organizing teaching materials, but the AI features are still developing. The summarization is sometimes inaccurate, especially with complex educational content. The organization system is intuitive, and the ability to tag and categorize resources is helpful.",
+        "authorName": "Amanda Lee",
+        "date": "2024-02-10",
+        "stars": 3
+      },
+      {
+        "review": "I appreciate how Google Notebook helps me keep track of all my teaching resources in one place. The AI-powered suggestions for related content have introduced me to valuable resources I might have missed otherwise. The mobile app makes it easy to save and access materials on the go.",
+        "authorName": "Thomas Brown",
+        "date": "2023-12-20",
+        "stars": 4
+      },
+      {
+        "review": "While Google Notebook is useful for basic organization, I find the AI features to be more gimmicky than practical. The summarization often misses key points in educational content, and the suggestions are sometimes irrelevant. The basic organization features work well, but I wouldn't rely on the AI components for critical tasks.",
+        "authorName": "Patricia Garcia",
+        "date": "2024-01-05",
+        "stars": 3
+      }
+    ]
+  },
+  "chatgpt": {
+    "name": "ChatGPT",
+    "reviews": [
+      {
+        "review": "ChatGPT has become an indispensable tool in my teaching practice. I use it to generate lesson ideas, create differentiated worksheets, and even help with grading rubrics. The ability to have it explain complex concepts in simpler terms has been invaluable for helping struggling students.",
+        "authorName": "Jessica Williams",
+        "date": "2024-02-15",
+        "stars": 5
+      },
+      {
+        "review": "I've integrated ChatGPT into my lesson planning process, and it's significantly reduced my preparation time. It helps me brainstorm creative activities, generate discussion questions, and even create assessment materials. The ability to refine its responses ensures I get exactly what I need for my classroom.",
+        "authorName": "Daniel Kim",
+        "date": "2024-01-28",
+        "stars": 5
+      },
+      {
+        "review": "ChatGPT is a powerful tool for teachers, but it requires careful prompting and fact-checking. I use it primarily for generating ideas and frameworks, which I then adapt to my specific teaching context. It's excellent for creating differentiated materials for students with varying abilities.",
+        "authorName": "Rachel Adams",
+        "date": "2024-02-10",
+        "stars": 4
+      },
+      {
+        "review": "I've found ChatGPT to be particularly useful for creating personalized learning materials. I can input a student's interests and learning style, and it generates content that's more engaging for them. The ability to have it explain concepts in multiple ways has been helpful for reaching all my students.",
+        "authorName": "Kevin O'Brien",
+        "date": "2023-12-20",
+        "stars": 4
+      },
+      {
+        "review": "While ChatGPT is impressive, I'm cautious about relying too heavily on it. I use it primarily as a brainstorming tool and always review and modify its output to ensure accuracy and appropriateness for my students. It's excellent for generating ideas but shouldn't replace teacher expertise.",
+        "authorName": "Michelle Patel",
+        "date": "2024-01-05",
+        "stars": 3
+      }
+    ]
+  },
+  "nearpod": {
+    "name": "Nearpod",
+    "reviews": [
+      {
+        "review": "Nearpod has revolutionized my teaching with its interactive presentation capabilities. The AI-powered insights help me understand student engagement in real-time, allowing me to adjust my teaching on the fly. The ability to create interactive lessons with polls, quizzes, and collaborative boards keeps my students engaged throughout class.",
+        "authorName": "Jennifer Martinez",
+        "date": "2024-02-15",
+        "stars": 5
+      },
+      {
+        "review": "The library of pre-made lessons in Nearpod is a huge time-saver, and the ability to customize them to fit my curriculum is excellent. My students enjoy the interactive elements, especially the 3D objects and virtual reality experiences. The reporting features help me track student engagement and understanding.",
+        "authorName": "Robert Taylor",
+        "date": "2024-01-28",
+        "stars": 5
+      },
+      {
+        "review": "Nearpod is a powerful tool, but it has a steep learning curve. Creating interactive lessons takes time, and the interface can be overwhelming at first. Once you get the hang of it, though, it's incredibly effective for student engagement. The AI insights are helpful but sometimes misinterpret student behavior.",
+        "authorName": "Amanda Lee",
+        "date": "2024-02-10",
+        "stars": 4
+      },
+      {
+        "review": "I appreciate the variety of interactive elements in Nearpod, but the subscription is expensive for what I use. The student-paced mode is great for differentiation, but I wish there were more options for offline use. The AI-powered recommendations for content are sometimes helpful but often miss the mark.",
+        "authorName": "Thomas Brown",
+        "date": "2023-12-20",
+        "stars": 3
+      },
+      {
+        "review": "Nearpod has transformed my classroom into an interactive learning environment. The ability to embed videos, quizzes, and collaborative boards in one platform streamlines my lessons. The student responses feature helps me gauge understanding quickly and adjust my teaching accordingly. The AI insights add another layer of understanding to my teaching practice.",
+        "authorName": "Patricia Garcia",
+        "date": "2024-01-05",
+        "stars": 5
+      }
+    ]
+  },
+  "flipgrid": {
+    "name": "Flipgrid",
+    "reviews": [
+      {
+        "review": "Flipgrid has given my students a voice in the classroom. The video discussion format helps shy students participate more comfortably, and I love seeing their creativity shine through. The AI-powered moderation features help me manage inappropriate content, though they're not perfect.",
+        "authorName": "Jessica Williams",
+        "date": "2024-02-15",
+        "stars": 5
+      },
+      {
+        "review": "This platform has transformed how my students engage with literature. They create thoughtful video responses to reading prompts, and the peer feedback component encourages critical thinking. The interface is intuitive, and the Microsoft integration works seamlessly. The AI transcription feature helps me review content more efficiently.",
+        "authorName": "Daniel Kim",
+        "date": "2024-01-28",
+        "stars": 4
+      },
+      {
+        "review": "Flipgrid is great for fostering discussion, but the video-only format can be limiting for some students. I appreciate the accessibility features, but wish there were more options for text-based responses. The AI moderation is helpful but sometimes flags appropriate content as inappropriate.",
+        "authorName": "Rachel Adams",
+        "date": "2024-02-10",
+        "stars": 3
+      },
+      {
+        "review": "My students love creating video responses, and I appreciate how Flipgrid encourages thoughtful communication. The ability to moderate responses before they're visible to the class gives me control over the discussion. The AI-powered analytics help me track student engagement and participation patterns.",
+        "authorName": "Kevin O'Brien",
+        "date": "2023-12-20",
+        "stars": 4
+      },
+      {
+        "review": "While Flipgrid is engaging, the video format can be challenging for students with limited internet access or privacy concerns. The platform works well for specific assignments, but I wouldn't use it as my primary discussion tool. The AI features are promising but still need refinement for educational contexts.",
+        "authorName": "Michelle Patel",
+        "date": "2024-01-05",
+        "stars": 3
+      }
+    ]
+  },
+  "kahoot": {
+    "name": "Kahoot",
+    "reviews": [
+      {
+        "review": "This is a great tool!",
+        "authorName": "User",
+        "stars": 4,
+        "date": "2025-04-27T04:15:17.599Z",
+        "userId": "user_2vMudNEDlPg6nn5rvQcednbP6If"
+      }
+    ]
+  },
+  "aicompass": {
+    "name": "AICompass",
+    "reviews": [
+      {
+        "review": "Legendary experience that came from this!",
+        "authorName": "User",
+        "stars": 5,
+        "date": "2025-04-27T04:15:33.763Z",
+        "userId": "user_2vMudNEDlPg6nn5rvQcednbP6If"
+      }
+    ]
+  }
+}

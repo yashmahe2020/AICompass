@@ -1,0 +1,44 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { getSampleProductsReviews, saveSampleProductsReviews } from "@/lib/sample-data"; // Adjust the import path as necessary
+import { Review } from "@/lib/types";
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === "POST") {
+    const { toolName, review, authorName, stars } = req.body;
+
+    // Validate the input
+    if (!toolName || !review || !authorName || stars === undefined) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    // Create a new review object
+    const newReview: Review = {
+      review,
+      authorName,
+      date: new Date().toISOString(),
+      stars,
+    };
+
+    // Get existing reviews
+    const sampleProductsReviews = await getSampleProductsReviews();
+
+    // Check if the tool exists, if not, create it
+    if (!sampleProductsReviews[toolName]) {
+      sampleProductsReviews[toolName] = {
+        name: toolName,
+        reviews: [],
+      };
+    }
+
+    // Add the review to the corresponding tool in sampleProductsReviews
+    sampleProductsReviews[toolName].reviews.push(newReview);
+
+    // Save the updated reviews back to the JSON file
+    await saveSampleProductsReviews(sampleProductsReviews);
+
+    return res.status(200).json({ message: "Review submitted successfully." });
+  } else {
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+} 
