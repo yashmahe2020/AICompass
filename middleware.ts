@@ -1,24 +1,36 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { authMiddleware } from "@clerk/nextjs";
 
-// Create a matcher for protected routes
-const isProtectedRoute = createRouteMatcher([
-  "/submit(.*)",
-  "/api/tools/:toolId/reviews",
-  "/api/ai-summary/:toolId"
-]);
-
-export default clerkMiddleware((auth, req) => {
-  // If the user is not authenticated and trying to access a protected route, redirect to the home page
-  if (isProtectedRoute(req) && !auth) {
-    return Response.redirect(new URL("/", req.url));
-  }
+// This example protects all routes including api/trpc routes
+// Please edit this to allow other routes to be public as needed.
+// See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your middleware
+export default authMiddleware({
+  // Routes that can be accessed while signed out
+  publicRoutes: [
+    "/",
+    "/browse",
+    "/api/webhooks(.*)",
+    "/[productId]",
+    "/tool/(.*)",
+    "/api/tools",
+    "/api/tools/(.*)"
+  ],
+  // Routes that can always be accessed, and have
+  // no authentication information
+  ignoredRoutes: [
+    "/api/tools/(.*)/reviews"
+  ]
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next
+     * - static (static files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    "/((?!static|.*\\..*|_next|favicon.ico).*)",
+    "/",
   ],
 };
