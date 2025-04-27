@@ -21,10 +21,10 @@ export default authMiddleware({
   ],
   // Add debug mode to help diagnose issues
   debug: true,
-  // Handle token expiration
+  // Handle authentication and redirects
   afterAuth: (auth, req) => {
-    // If the token is expired, redirect to sign-in
-    if (auth.sessionId && !auth.session) {
+    // If the user is not signed in and trying to access a protected route
+    if (!auth.userId && !auth.isPublicRoute) {
       const signInUrl = new URL('/sign-in', req.url);
       signInUrl.searchParams.set('redirect_url', req.url);
       return Response.redirect(signInUrl);
