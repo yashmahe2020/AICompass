@@ -282,8 +282,8 @@ INSTRUCTIONS:
     } catch (error) {
       console.error(`Error updating AI summary (attempt ${retryCount + 1}/${maxRetries}):`, error);
       
-      // If it's a permission error, wait a bit before retrying
-      if (error.code === 'permission-denied') {
+      // Type guard for Firebase error
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'permission-denied') {
         retryCount++;
         if (retryCount < maxRetries) {
           // Wait for 1 second before retrying (with exponential backoff)
