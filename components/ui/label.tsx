@@ -10,7 +10,7 @@ export function Label({ children, className, ...props }: LabelProps) {
   return (
     <label 
       {...props} 
-      className={`block text-sm font-medium text-black ${className || ""}`}
+      className={`block text-sm font-medium text-gray-700 ${className || ""}`}
     >
       {children}
     </label>

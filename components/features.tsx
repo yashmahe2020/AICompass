@@ -27,19 +27,19 @@ export default function Features() {
   return (
     <section className="container space-y-16 py-24 md:py-32">
       <div className="mx-auto max-w-[58rem] text-center">
-        <h2 className="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-5xl">Cutting-Edge Solutions</h2>
-        <p className="mt-4 text-gray-500 sm:text-lg dark:text-gray-400">
+        <h2 className="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-5xl text-gray-900">Cutting-Edge Solutions</h2>
+        <p className="mt-4 text-gray-600 sm:text-lg">
           Discover how Amane Soft can transform your business with our innovative technologies.
         </p>
       </div>
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
         {features.map((feature) => (
-          <div key={feature.name} className="relative overflow-hidden rounded-lg border border-gray-200 bg-white p-8 dark:border-gray-800 dark:bg-gray-950">
+          <div key={feature.name} className="relative overflow-hidden rounded-lg border border-gray-200 bg-white p-8">
             <div className="flex items-center gap-4">
-              <feature.icon className="h-8 w-8" />
-              <h3 className="font-bold">{feature.name}</h3>
+              <feature.icon className="h-8 w-8 text-yellow-600" />
+              <h3 className="font-bold text-gray-900">{feature.name}</h3>
             </div>
-            <p className="mt-2 text-gray-500 dark:text-gray-400">{feature.description}</p>
+            <p className="mt-2 text-gray-600">{feature.description}</p>
           </div>
         ))}
       </div>

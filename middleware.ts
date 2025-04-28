@@ -12,7 +12,8 @@ export default authMiddleware({
     "/[productId]",
     "/tool/(.*)",
     "/api/tools",
-    "/api/tools/(.*)"
+    "/api/tools/(.*)",
+    "/submit"
   ],
   // Routes that can always be accessed, and have
   // no authentication information
@@ -21,15 +22,9 @@ export default authMiddleware({
   ],
   // Add debug mode to help diagnose issues
   debug: true,
-  // Handle authentication and redirects
-  afterAuth: (auth, req) => {
-    // If the user is not signed in and trying to access a protected route
-    if (!auth.userId && !auth.isPublicRoute) {
-      const signInUrl = new URL('/sign-in', req.url);
-      signInUrl.searchParams.set('redirect_url', req.url);
-      return Response.redirect(signInUrl);
-    }
-    return null;
+  // Prevent Clerk from redirecting to /sign-in
+  afterAuth(auth, req, evt) {
+    // Your authentication logic here
   }
 });
 

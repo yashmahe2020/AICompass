@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FiveStarRating } from "./five-star-rating";
 import { Loader2 } from "lucide-react";
-import { useAuth, SignInButton } from "@clerk/nextjs";
+import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 
 interface Tool {
   id: string;
@@ -19,6 +19,8 @@ interface Tool {
 
 export function FeedbackForm() {
   const { userId, isLoaded } = useAuth();
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
   const [formData, setFormData] = useState({
     toolName: "",
     review: "",
@@ -28,6 +30,10 @@ export function FeedbackForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+
+  const handleSignIn = () => {
+    openSignIn();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,10 +79,15 @@ export function FeedbackForm() {
         toolId = tool.id;
       }
       
+      // Get the user's full name from Clerk
+      const firstName = user?.firstName || '';
+      const lastName = user?.lastName || '';
+      const fullName = `${firstName} ${lastName}`.trim() || 'Anonymous User';
+      
       // Submit the review with user information
       const reviewData = {
         ...formData,
-        authorName: "User", // We'll use a generic name since we don't have access to the user's name in the client
+        authorName: fullName,
         userId: userId,
       };
       
@@ -119,73 +130,71 @@ export function FeedbackForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-3 bg-red-900/50 border border-red-800 rounded-md text-red-200">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
           {error}
         </div>
       )}
       
-      {success && (
-        <div className="p-3 bg-green-900/50 border border-green-800 rounded-md text-green-200">
-          Your review has been submitted successfully! Redirecting...
+      {success ? (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-md text-green-600">
+          <p className="font-medium">Thank you for your review!</p>
+          <p className="mt-2">Your feedback has been submitted successfully.</p>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => router.push('/browse')}
+              className="text-green-600 hover:text-green-700 font-medium"
+            >
+              Browse more tools →
+            </button>
+          </div>
         </div>
-      )}
-      
-      <div className="space-y-2">
-        <Label htmlFor="toolName" className="text-gray-300">Tool Name</Label>
-        <Input
-          id="toolName"
-          value={formData.toolName}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, toolName: e.target.value })}
-          placeholder="Enter the name of the AI tool"
-          required
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="review" className="text-gray-300">Your Review</Label>
-        <Textarea
-          id="review"
-          value={formData.review}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, review: e.target.value })}
-          placeholder="Share your experience with this AI tool"
-          rows={5}
-          required
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label className="text-gray-300">Rating</Label>
-        <FiveStarRating
-          rating={formData.stars}
-          onRatingChange={(rating: number) => setFormData({ ...formData, stars: rating })}
-          disabled={isSubmitting}
-        />
-      </div>
-      
-      {!userId ? (
-        <SignInButton mode="modal">
-          <Button
-            type="button"
-            className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
-          >
-            Sign in to submit a review
-          </Button>
-        </SignInButton>
       ) : (
-        <Button
-          type="submit"
-          className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
-            </>
-          ) : (
-            "Submit Review"
-          )}
-        </Button>
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="toolName">AI Tool Name</Label>
+            <Input
+              id="toolName"
+              value={formData.toolName}
+              onChange={(e) => setFormData({ ...formData, toolName: e.target.value })}
+              placeholder="Enter the name of the AI tool"
+              required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Rating</Label>
+            <FiveStarRating
+              rating={formData.stars}
+              onRatingChange={(rating) => setFormData({ ...formData, stars: rating })}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="review">Your Review</Label>
+            <Textarea
+              id="review"
+              value={formData.review}
+              onChange={(e) => setFormData({ ...formData, review: e.target.value })}
+              placeholder="Share your experience with this AI tool..."
+              rows={5}
+              required
+            />
+          </div>
+          
+          <div className="flex justify-end">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit Review'
+              )}
+            </Button>
+          </div>
+        </>
       )}
     </form>
   );

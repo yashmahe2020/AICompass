@@ -66,13 +66,21 @@ export default function ToolPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white pt-20 pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white text-gray-900 pt-32 pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link 
+            href="/browse" 
+            className="inline-flex items-center text-yellow-600 hover:text-yellow-700 mb-8"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Browse
+          </Link>
+          
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-yellow-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-yellow-600 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
               <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
             </div>
-            <p className="mt-4 text-gray-300">Loading tool details...</p>
+            <p className="mt-4 text-gray-600">Loading tool details...</p>
           </div>
         </div>
       </div>
@@ -81,13 +89,21 @@ export default function ToolPage({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white pt-20 pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-12 bg-gray-900 border border-gray-800 rounded-lg">
-            <p className="text-gray-300">{error}</p>
+      <div className="min-h-screen bg-white text-gray-900 pt-32 pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link 
+            href="/browse" 
+            className="inline-flex items-center text-yellow-600 hover:text-yellow-700 mb-8"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Browse
+          </Link>
+          
+          <div className="text-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+            <p className="text-gray-600">{error}</p>
             <button 
               onClick={() => window.location.reload()}
-              className="mt-4 text-yellow-400 hover:text-yellow-300 transition-colors"
+              className="mt-4 text-yellow-600 hover:text-yellow-700 transition-colors"
             >
               Try again
             </button>
@@ -102,45 +118,70 @@ export default function ToolPage({
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-20 pb-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <Link 
-            href="/browse" 
-            className="inline-flex items-center text-yellow-400 hover:text-yellow-300 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Browse
-          </Link>
-        </div>
+    <div className="min-h-screen bg-white text-gray-900 pt-32 pb-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Link 
+          href="/browse" 
+          className="inline-flex items-center text-yellow-600 hover:text-yellow-700 mb-8"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Browse
+        </Link>
         
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-white">{product.name}</h1>
-          <div className="flex items-center mb-4">
-            <div className="flex items-center mr-4">
-              <Star className="h-5 w-5 text-yellow-400 mr-1" />
-              <span className="text-yellow-400 font-medium">{averageRating.toFixed(1)}</span>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-yellow-600 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
             </div>
-            <div className="flex items-center">
-              <MessageSquare className="h-5 w-5 text-gray-400 mr-1" />
-              <span className="text-gray-300">{reviews.length} reviews</span>
-            </div>
+            <p className="mt-4 text-gray-600">Loading tool details...</p>
           </div>
-          <p className="text-gray-300">
-            Reviews and insights from users who have used this AI tool
-          </p>
-        </div>
-        
-        <Reviews product={product} reviews={reviews} />
-        
-        <div className="mt-12 text-center">
-          <Link 
-            href="/browse" 
-            className="inline-flex items-center bg-yellow-400 text-black px-6 py-3 rounded-md hover:bg-yellow-500 transition-colors font-medium"
-          >
-            Browse More Tools
-          </Link>
-        </div>
+        ) : error ? (
+          <div className="text-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+            <p className="text-gray-600">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-4 text-yellow-600 hover:text-yellow-700 transition-colors"
+            >
+              Try again
+            </button>
+          </div>
+        ) : product ? (
+          <>
+            <div className="mb-12">
+              <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-gray-900">{product.name}</h1>
+              <div className="flex items-center text-gray-600">
+                <Star className="h-5 w-5 text-yellow-600 mr-1" />
+                <span className="mr-2 text-yellow-600 font-medium">{averageRating.toFixed(1)}</span>
+                <span className="flex items-center">
+                  <MessageSquare className="h-5 w-5 mr-1" />
+                  {reviews.length} reviews
+                </span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-8">
+              <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-8">
+                <div className="p-6">
+                  <h2 className="text-2xl font-semibold mb-4 text-gray-900">Reviews</h2>
+                  <Reviews product={product} reviews={reviews} />
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-12 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Share Your Experience</h2>
+              <p className="text-gray-600 mb-6">
+                Have you used {product.name}? Share your experience to help others make informed decisions.
+              </p>
+              <Link 
+                href="/submit" 
+                className="block w-full bg-yellow-600 text-white text-center py-3 rounded-lg font-medium hover:bg-yellow-700 transition-colors"
+              >
+                Submit a Review
+              </Link>
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );

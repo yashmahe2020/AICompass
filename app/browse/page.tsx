@@ -58,11 +58,11 @@ export default function BrowsePage() {
   }, [searchQuery, tools]);
 
   return (
-    <div className="min-h-screen bg-black text-white pt-32 pb-16">
+    <div className="min-h-screen bg-white text-gray-900 pt-32 pb-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-yellow-400">Discover AI Tools</h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-yellow-600">Discover AI Tools</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Explore our curated collection of AI tools with comprehensive reviews and insights from the community.
           </p>
         </div>
@@ -76,33 +76,33 @@ export default function BrowsePage() {
             placeholder="Search AI tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-3 border border-gray-800 rounded-md bg-gray-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+            className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-md bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
           />
         </div>
         
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-yellow-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-yellow-600 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
               <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
             </div>
-            <p className="mt-4 text-gray-300">Loading tools...</p>
+            <p className="mt-4 text-gray-600">Loading tools...</p>
           </div>
         ) : error ? (
-          <div className="text-center py-12 bg-gray-900 border border-gray-800 rounded-lg">
-            <p className="text-gray-300">{error}</p>
+          <div className="text-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+            <p className="text-gray-600">{error}</p>
             <button 
               onClick={() => window.location.reload()}
-              className="mt-4 text-yellow-400 hover:text-yellow-300 transition-colors"
+              className="mt-4 text-yellow-600 hover:text-yellow-700 transition-colors"
             >
               Try again
             </button>
           </div>
         ) : filteredTools.length === 0 ? (
-          <div className="text-center py-12 bg-gray-900 border border-gray-800 rounded-lg">
-            <p className="text-gray-300">No tools found matching "{searchQuery}"</p>
+          <div className="text-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+            <p className="text-gray-600">No tools found matching "{searchQuery}"</p>
             <button 
               onClick={() => setSearchQuery("")}
-              className="mt-4 text-yellow-400 hover:text-yellow-300 transition-colors"
+              className="mt-4 text-yellow-600 hover:text-yellow-700 transition-colors"
             >
               Clear search
             </button>
@@ -113,20 +113,20 @@ export default function BrowsePage() {
               <Link 
                 key={tool.id} 
                 href={`/tool/${tool.id}`}
-                className="block p-6 border border-gray-800 rounded-lg hover:border-yellow-400 transition-all bg-gray-900 hover:bg-gray-800 group"
+                className="block p-6 border border-gray-200 rounded-lg hover:border-yellow-600 transition-all bg-white hover:bg-gray-50 group"
               >
-                <h2 className="text-xl font-semibold mb-2 text-white group-hover:text-yellow-400">{tool.name}</h2>
-                <div className="flex items-center text-sm text-gray-300">
-                  <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                  <span className="mr-2 text-yellow-400">{tool.averageRating ? tool.averageRating.toFixed(1) : '0.0'}</span>
+                <h2 className="text-xl font-semibold mb-2 text-gray-900 group-hover:text-yellow-600">{tool.name}</h2>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Star className="h-4 w-4 text-yellow-600 mr-1" />
+                  <span className="mr-2 text-yellow-600">{tool.averageRating ? tool.averageRating.toFixed(1) : '0.0'}</span>
                   <span className="flex items-center">
                     <MessageSquare className="h-4 w-4 mr-1" />
                     {tool.reviewCount || 0} reviews
                   </span>
                 </div>
-                <p className="text-gray-400 mt-3">Explore reviews and insights</p>
+                <p className="text-gray-600 mt-3">Explore reviews and insights</p>
                 <div className="mt-4 flex justify-end">
-                  <span className="text-yellow-400 text-sm font-medium">View details →</span>
+                  <span className="text-yellow-600 text-sm font-medium">View details →</span>
                 </div>
               </Link>
             ))}

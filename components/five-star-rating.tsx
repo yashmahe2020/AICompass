@@ -36,7 +36,7 @@ const Star = ({ filled, onClick, disabled = false }: StarProps) => {
     <span
       onClick={onClick}
       className={`${disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'} text-xl transition-colors ${
-        filled ? "text-yellow-400" : "text-gray-500 hover:text-yellow-300"
+        filled ? "text-yellow-600" : "text-gray-400 hover:text-yellow-500"
       }`}
     >
       ★
