@@ -53,20 +53,27 @@ export async function createProduct(productId: string, product: Product): Promis
 }
 
 // Reviews Collection Operations
-export async function getProductReviews(productId: string): Promise<Review[]> {
+export async function getProductReviews(productId: string, options?: { includeUnsafe?: boolean }): Promise<Review[]> {
   try {
     if (isServer()) {
-      // Use admin SDK for server-side operations
-      const reviewsSnapshot = await adminDb.collection('reviews')
-        .where('productId', '==', productId)
-        .get();
+      let queryRef = adminDb.collection('reviews').where('productId', '==', productId);
+      if (!options?.includeUnsafe) {
+        queryRef = queryRef.where('safe', 'in', [true, null]);
+      }
+      const reviewsSnapshot = await queryRef.get();
       return reviewsSnapshot.docs.map(doc => doc.data() as Review);
     } else {
-      // Use client SDK for client-side operations
-      const reviewsQuery = query(
+      let reviewsQuery = query(
         collection(db, 'reviews'),
         where('productId', '==', productId)
       );
+      if (!options?.includeUnsafe) {
+        reviewsQuery = query(
+          collection(db, 'reviews'),
+          where('productId', '==', productId),
+          where('safe', 'in', [true, null])
+        );
+      }
       const querySnapshot = await getDocs(reviewsQuery);
       return querySnapshot.docs.map(doc => doc.data() as Review);
     }
@@ -76,53 +83,28 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
   }
 }
 
-export async function addReview(productId: string, review: Review): Promise<void> {
+export async function addReview(productId: string, review: Review, options?: { skipAISummary?: boolean }): Promise<void> {
   try {
     if (isServer()) {
       // Use admin SDK for server-side operations
       // Add the review to the reviews collection
-      const reviewId = `${productId}_${Date.now()}`;
+      const reviewId = review.id || `${productId}_${Date.now()}`;
       await adminDb.collection('reviews').doc(reviewId).set({
         ...review,
         id: reviewId
       });
 
-      // Update the product's review count
-      const productRef = adminDb.collection('products').doc(productId);
-      const productDoc = await productRef.get();
-      
-      if (productDoc.exists) {
-        await productRef.update({
-          reviewCount: admin.firestore.FieldValue.increment(1),
-          updatedAt: new Date().toISOString()
-        });
-      } else {
-        // If the product doesn't exist, create it
-        const newProduct = {
-          name: review.productName,
-          reviewCount: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        await createProduct(productId, newProduct);
-      }
-    } else {
-      // Use client SDK for client-side operations
-      // Add the review to the reviews collection
-      const reviewId = `${productId}_${Date.now()}`;
-      await setDoc(doc(db, 'reviews', reviewId), {
-        ...review,
-        id: reviewId
-      });
-
-      // Update the product's review count
-      const productRef = doc(db, 'products', productId);
-      await updateDoc(productRef, {
-        reviewCount: increment(1),
-        updatedAt: new Date().toISOString()
-      }).catch(async (error) => {
-        // If the product doesn't exist, create it
-        if (error.code === 'not-found') {
+      // Only update the product's review count and summary if not skipping and review is safe
+      if (!options?.skipAISummary && review.safe !== false) {
+        const productRef = adminDb.collection('products').doc(productId);
+        const productDoc = await productRef.get();
+        if (productDoc.exists) {
+          await productRef.update({
+            reviewCount: admin.firestore.FieldValue.increment(1),
+            updatedAt: new Date().toISOString()
+          });
+        } else {
+          // If the product doesn't exist, create it
           const newProduct = {
             name: review.productName,
             reviewCount: 1,
@@ -130,14 +112,38 @@ export async function addReview(productId: string, review: Review): Promise<void
             updatedAt: new Date().toISOString()
           };
           await createProduct(productId, newProduct);
-        } else {
-          throw error;
         }
+        // Generate and update AI summary for the product
+        await updateProductAISummary(productId);
+      }
+    } else {
+      // Use client SDK for client-side operations
+      const reviewId = review.id || `${productId}_${Date.now()}`;
+      await setDoc(doc(db, 'reviews', reviewId), {
+        ...review,
+        id: reviewId
       });
+      if (!options?.skipAISummary && review.safe !== false) {
+        const productRef = doc(db, 'products', productId);
+        await updateDoc(productRef, {
+          reviewCount: increment(1),
+          updatedAt: new Date().toISOString()
+        }).catch(async (error) => {
+          if (error.code === 'not-found') {
+            const newProduct = {
+              name: review.productName,
+              reviewCount: 1,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            await createProduct(productId, newProduct);
+          } else {
+            throw error;
+          }
+        });
+        await updateProductAISummary(productId);
+      }
     }
-
-    // Generate and update AI summary for the product
-    await updateProductAISummary(productId);
   } catch (error) {
     console.error('Error adding review:', error);
     throw error;

@@ -41,7 +41,7 @@ export default function Navbar() {
             <SignedOut>
               <Button 
                 variant="ghost" 
-                className="text-sm text-gray-600 hover:text-yellow-600"
+                className="text-sm text-gray-600 hover:text-yellow-600 hover:bg-gray-200"
                 onClick={handleSignIn}
               >
                 Sign In

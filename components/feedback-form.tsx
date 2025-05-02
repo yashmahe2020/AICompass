@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { FiveStarRating } from "./five-star-rating";
 import { Loader2 } from "lucide-react";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
+import { RecaptchaCheckbox } from "./recaptcha-checkbox";
 
 interface Tool {
   id: string;
@@ -30,9 +31,35 @@ export function FeedbackForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const [isRecaptchaVerified, setIsRecaptchaVerified] = useState(false);
 
   const handleSignIn = () => {
     openSignIn();
+  };
+
+  // Validate form data
+  const validateForm = () => {
+    if (!formData.toolName.trim()) {
+      setError('Please enter a tool name');
+      return false;
+    }
+    
+    if (formData.stars < 1 || formData.stars > 5) {
+      setError('Please select a rating between 1 and 5 stars');
+      return false;
+    }
+    
+    if (formData.review.length < 5) {
+      setError('Please enter a review with at least 5 characters');
+      return false;
+    }
+    
+    if (formData.review.length > 1000) {
+      setError('Review is too long. Please keep it under 1000 characters');
+      return false;
+    }
+    
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,6 +67,16 @@ export function FeedbackForm() {
     
     if (!userId) {
       setError('You must be signed in to submit a review');
+      return;
+    }
+    
+    if (!isRecaptchaVerified) {
+      setError('Please complete the reCAPTCHA verification');
+      return;
+    }
+    
+    // Validate form data
+    if (!validateForm()) {
       return;
     }
     
@@ -182,8 +219,10 @@ export function FeedbackForm() {
             />
           </div>
           
-          <div className="flex justify-end">
-            <Button type="submit" disabled={isSubmitting}>
+          <RecaptchaCheckbox onVerified={setIsRecaptchaVerified} />
+          
+          <div className="flex justify-start">
+            <Button type="submit" disabled={isSubmitting || !isRecaptchaVerified}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

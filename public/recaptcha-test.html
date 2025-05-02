@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>reCAPTCHA Test</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .verified {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .not-verified {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+<body>
+  <h1>reCAPTCHA Test</h1>
+  <p>This is a direct test of reCAPTCHA using plain HTML.</p>
+  
+  <div class="container">
+    <form id="recaptcha-form">
+      <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+      <br/>
+      <button type="button" onclick="checkRecaptcha()">Verify</button>
+    </form>
+    
+    <div id="status" class="status not-verified">
+      Status: Not verified
+    </div>
+  </div>
+  
+  <script>
+    function checkRecaptcha() {
+      const response = grecaptcha.getResponse();
+      const statusElement = document.getElementById('status');
+      
+      if (response) {
+        statusElement.textContent = 'Status: Verified';
+        statusElement.className = 'status verified';
+        console.log('reCAPTCHA response:', response);
+      } else {
+        statusElement.textContent = 'Status: Not verified';
+        statusElement.className = 'status not-verified';
+      }
+    }
+  </script>
+</body>
+</html> 
