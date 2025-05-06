@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import { FiveStarRating } from "./five-star-rating";
 import { Loader2 } from "lucide-react";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import { RecaptchaCheckbox } from "./recaptcha-checkbox";
+import Script from 'next/script';
 
 interface Tool {
   id: string;

@@ -5,7 +5,7 @@ import * as admin from 'firebase-admin';
 import OpenAI from 'openai';
 
 // Rate limiting configuration
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 1 minute
 const MAX_REVIEWS_PER_WINDOW = 3; // Max 3 reviews per minute
 
 // Helper function to check rate limit
@@ -162,12 +162,12 @@ export async function POST(
         productId: params.toolId,
         productName: productName || params.toolId,
         safe: false,
-        moderationCategories: categories,
+        moderationCategories: categories as unknown as Record<string, boolean>,
       };
       // Store the unsafe review in Firebase (but do not update summary/rating)
       await addReview(params.toolId, unsafeReview, { skipAISummary: true });
       return NextResponse.json({
-        message: 'Your review is being held for moderation. It may be published after review.',
+        message: 'Your review may have been unsafe and is being reviewed by our team.',
         heldForReview: true,
         categories,
       }, { status: 202 });

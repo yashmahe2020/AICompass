@@ -21,7 +21,7 @@ export default authMiddleware({
     "/api/tools/(.*)/reviews"
   ],
   // Add debug mode to help diagnose issues
-  debug: true,
+  debug: false,
   // Prevent Clerk from redirecting to /sign-in
   afterAuth(auth, req, evt) {
     // Your authentication logic here
