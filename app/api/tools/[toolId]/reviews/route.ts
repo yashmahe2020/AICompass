@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProductReviews, addReview, getProduct, createProduct } from '@/lib/firebase-db';
+import { getProductReviews, addReview, getProduct, createProduct, getUserProfile } from '@/lib/firebase-db';
 import { adminDb } from '@/lib/firebase-admin';
 import * as admin from 'firebase-admin';
 import OpenAI from 'openai';
@@ -133,8 +133,15 @@ export async function POST(
     
     const { review, authorName, stars, userId, productName } = body;
     
-    // Check rate limit
+    // ENFORCE eduVerified
     if (userId) {
+      const userProfile = await getUserProfile(userId);
+      if (!userProfile || userProfile.eduVerified !== true) {
+        return NextResponse.json(
+          { error: 'You must be a verified student or teacher to submit a review.' },
+          { status: 403 }
+        );
+      }
       const isAllowed = await checkRateLimit(userId);
       if (!isAllowed) {
         return NextResponse.json(

@@ -313,4 +313,46 @@ export async function updateProduct(productId: string, productData: Partial<Prod
     console.error('Error updating product:', error);
     throw error;
   }
+}
+
+// User Profile Operations
+export async function getUserProfile(userId: string) {
+  try {
+    if (isServer()) {
+      const userDoc = await adminDb.collection('users').doc(userId).get();
+      return userDoc.exists ? userDoc.data() : null;
+    } else {
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      return userDoc.exists() ? userDoc.data() : null;
+    }
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    return null;
+  }
+}
+
+export async function setUserProfile(userId: string, profile: any) {
+  try {
+    if (isServer()) {
+      await adminDb.collection('users').doc(userId).set(profile, { merge: true });
+    } else {
+      await setDoc(doc(db, 'users', userId), profile, { merge: true });
+    }
+  } catch (error) {
+    console.error('Error setting user profile:', error);
+    throw error;
+  }
+}
+
+export async function updateUserProfile(userId: string, profile: any) {
+  try {
+    if (isServer()) {
+      await adminDb.collection('users').doc(userId).update(profile);
+    } else {
+      await updateDoc(doc(db, 'users', userId), profile);
+    }
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
+  }
 } 

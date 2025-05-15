@@ -4,18 +4,53 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useAuth,
+  useUser,
 } from '@clerk/nextjs'
 import { Inter } from "next/font/google"
 import type React from "react"
 import type { Metadata } from "next"
 import MouseMoveEffect from "@/components/mouse-move-effect"
 import Navbar from "@/app/components/Navbar"
+import EduVerificationClient from "@/components/edu-verification-client"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "AI Compass - Your Guide to AI Tools",
   description: "Discover, compare, and choose the best AI tools with comprehensive reviews and insights from the community.",
+}
+
+function useEduVerification() {
+  const { userId, isLoaded } = useAuth()
+  const { user } = useUser()
+
+  // REMOVE: useEffect(() => {
+  // REMOVE:   if (isLoaded && userId && user) {
+  // REMOVE:     const db = getFirestore(firebaseApp)
+  // REMOVE:     const email = user.primaryEmailAddress?.emailAddress || ""
+  // REMOVE:     const domain = email.split("@")[1] || ""
+  // REMOVE:     // Allow-list domains/tenants
+  // REMOVE:     const allowList = [
+  // REMOVE:       "edu", "k12.ca.us", "school.edu", // add more as needed
+  // REMOVE:     ]
+  // REMOVE:     const isEdu = allowList.some((d) => domain.endsWith(d))
+  // REMOVE:     let role = null
+  // REMOVE:     if (isEdu) {
+  // REMOVE:       // Simple heuristic: if email contains 'student' or 'teacher'
+  // REMOVE:       if (email.includes("student")) role = "student"
+  // REMOVE:       else if (email.includes("teacher")) role = "teacher"
+  // REMOVE:       else role = "student" // default
+  // REMOVE:     }
+  // REMOVE:     setDoc(doc(db, "users", userId), {
+  // REMOVE:       eduVerified: isEdu,
+  // REMOVE:       verified: isEdu,
+  // REMOVE:       role: isEdu ? role : null,
+  // REMOVE:       email,
+  // REMOVE:       updatedAt: new Date().toISOString(),
+  // REMOVE:     }, { merge: true })
+  // REMOVE:   }
+  // REMOVE: }, [isLoaded, userId, user])
 }
 
 export default function RootLayout({
@@ -52,6 +87,7 @@ export default function RootLayout({
             },
           }}
         >
+          <EduVerificationClient />
           <MouseMoveEffect />
           <Navbar />
           {children}

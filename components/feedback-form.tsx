@@ -11,6 +11,8 @@ import { Loader2 } from "lucide-react";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import { RecaptchaCheckbox } from "./recaptcha-checkbox";
 import Script from 'next/script';
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { app as firebaseApp } from "@/lib/firebase";
 
 interface Tool {
   id: string;
@@ -33,6 +35,30 @@ export function FeedbackForm() {
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const [isRecaptchaVerified, setIsRecaptchaVerified] = useState(false);
+  const [eduVerified, setEduVerified] = useState<null | boolean>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  useEffect(() => {
+    if (userId) {
+      const fetchProfile = async () => {
+        setProfileLoading(true);
+        try {
+          const db = getFirestore(firebaseApp);
+          const userDoc = await getDoc(doc(db, "users", userId));
+          if (userDoc.exists()) {
+            setEduVerified(userDoc.data().eduVerified === true);
+          } else {
+            setEduVerified(false);
+          }
+        } catch (e) {
+          setEduVerified(false);
+        } finally {
+          setProfileLoading(false);
+        }
+      };
+      fetchProfile();
+    }
+  }, [userId]);
 
   const handleSignIn = () => {
     openSignIn();
@@ -73,6 +99,11 @@ export function FeedbackForm() {
     
     if (!isRecaptchaVerified) {
       setError('Please complete the reCAPTCHA verification');
+      return;
+    }
+    
+    if (eduVerified === false) {
+      setError('You must be a verified student or teacher to submit a review.');
       return;
     }
     
@@ -160,6 +191,31 @@ export function FeedbackForm() {
       setIsSubmitting(false);
     }
   };
+
+  if (profileLoading) {
+    return <div className="py-8 text-center text-gray-500">Loading profile...</div>;
+  }
+
+  if (eduVerified === false) {
+    return (
+      <div className="py-8 text-center text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="text-lg font-semibold mb-2">Verification Required</div>
+        <div className="mb-4">You must verify your student or teacher status to submit a review.</div>
+        <button
+          onClick={() => router.push('/verify')}
+          className="bg-yellow-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-yellow-700 transition-colors mr-2"
+        >
+          Verify Now
+        </button>
+        <button
+          onClick={() => router.push('/browse')}
+          className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+        >
+          Verify Later
+        </button>
+      </div>
+    );
+  }
 
   if (!isLoaded) {
     return <div className="text-center py-4">Loading...</div>;

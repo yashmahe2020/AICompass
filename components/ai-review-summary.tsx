@@ -28,7 +28,7 @@ function DisplayRating({ rating }: { rating: number }) {
 }
 
 interface AIProductReviewSummaryProps {
-  product: Product;
+  product: Product & { id: string };
   reviews: Review[];
 }
 
@@ -46,7 +46,7 @@ export function AIProductReviewSummary({ product, reviews }: AIProductReviewSumm
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ product, reviews }),
+          body: JSON.stringify({ product: { id: product.id, name: product.name }, reviews }),
         });
 
         if (!response.ok) {
@@ -135,7 +135,7 @@ export function AIProductReviewSummary({ product, reviews }: AIProductReviewSumm
         <div className="space-y-4">
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">Summary</h3>
-            <p className="text-gray-600">{summary}</p>
+            <p className="text-gray-600">{decodeHTMLEntities(summary)}</p>
           </div>
           
           {themes.length > 0 && (
@@ -143,7 +143,7 @@ export function AIProductReviewSummary({ product, reviews }: AIProductReviewSumm
               <h3 className="text-lg font-medium text-gray-900 mb-2">Key Themes</h3>
               <ul className="list-disc pl-5 space-y-1">
                 {themes.map((theme, index) => (
-                  <li key={index} className="text-gray-600">{theme}</li>
+                  <li key={index} className="text-gray-600">{decodeHTMLEntities(theme)}</li>
                 ))}
               </ul>
             </div>
@@ -281,7 +281,7 @@ export function AIReviewSummary({ reviews }: { reviews: Review[] }) {
         <div className="space-y-4">
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">Summary</h3>
-            <p className="text-gray-600">{summary}</p>
+            <p className="text-gray-600">{decodeHTMLEntities(summary)}</p>
           </div>
           
           {themes.length > 0 && (
@@ -289,7 +289,7 @@ export function AIReviewSummary({ reviews }: { reviews: Review[] }) {
               <h3 className="text-lg font-medium text-gray-900 mb-2">Key Themes</h3>
               <ul className="list-disc pl-5 space-y-1">
                 {themes.map((theme, index) => (
-                  <li key={index} className="text-gray-600">{theme}</li>
+                  <li key={index} className="text-gray-600">{decodeHTMLEntities(theme)}</li>
                 ))}
               </ul>
             </div>
@@ -325,4 +325,12 @@ function extractThemes(reviews: Review[]): string[] {
   });
   
   return Array.from(themes).slice(0, 5); // Return top 5 themes
+}
+
+// Utility to decode HTML entities (e.g., for apostrophes)
+function decodeHTMLEntities(text: string) {
+  if (!text) return '';
+  const txt = document.createElement('textarea');
+  txt.innerHTML = text;
+  return txt.value;
 }
