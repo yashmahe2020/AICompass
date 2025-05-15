@@ -2,7 +2,7 @@ import { db } from './firebase';
 import { doc, getDoc, setDoc, increment, updateDoc } from 'firebase/firestore';
 import { Review } from './types';
 
-export async function getUserProfile(userId) {
+export async function getUserProfile(userId: string) {
   try {
     const userDoc = await getDoc(doc(db, 'users', userId));
     return userDoc.exists() ? userDoc.data() : null;
@@ -12,7 +12,7 @@ export async function getUserProfile(userId) {
   }
 }
 
-export async function setUserProfile(userId, profile) {
+export async function setUserProfile(userId: string, profile: any) {
   try {
     await setDoc(doc(db, 'users', userId), profile, { merge: true });
   } catch (error) {

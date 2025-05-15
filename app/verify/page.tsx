@@ -11,7 +11,7 @@ import { getUserProfile, setUserProfile } from "@/lib/firebase-client-db";
 const MODES = ["code", "sheerid", "idme"] as const;
 type Mode = typeof MODES[number];
 
-export const ALLOWED_DOMAINS = [
+const ALLOWED_DOMAINS = [
   "edu",
 
   "k12.ak.us",
