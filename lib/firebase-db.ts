@@ -5,9 +5,9 @@ import { Product, Review } from './types';
 import OpenAI from 'openai';
 import * as admin from 'firebase-admin';
 
-// Initialize OpenAI client
+// Initialize OpenAI client - using server-side API key for security
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Helper function to determine if we're in a server environment

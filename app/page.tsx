@@ -4,6 +4,11 @@ import CTA from "@/app/components/CTA"
 import Footer from "@/app/components/Footer"
 
 export default function Home() {
+  // Add debugging info in development
+  if (process.env.NODE_ENV === "development") {
+    console.log("Home page rendering, domain:", typeof window !== "undefined" ? window.location.hostname : "SSR");
+  }
+
   return (
     <div className="relative min-h-screen bg-white text-gray-900">
       {/* Background gradients */}

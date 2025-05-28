@@ -95,38 +95,54 @@ export default function VerifyPage() {
   const [testWriteResult, setTestWriteResult] = useState<string | null>(null);
   const [schoolEmail, setSchoolEmail] = useState("");
   const [checkingProfile, setCheckingProfile] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     async function checkAndAutoVerify() {
       if (!isLoaded || !userId || !user) return;
-      setCheckingProfile(true);
-      const profile = await getUserProfile(userId);
-      if (profile && profile.eduVerified && profile.verified) {
-        // Already verified, redirect
-        router.replace("/submit");
-        return;
+      
+      try {
+        setCheckingProfile(true);
+        const profile = await getUserProfile(userId);
+        
+        if (profile && profile.eduVerified && profile.verified) {
+          // Already verified, redirect after a delay to prevent loops
+          setRedirecting(true);
+          setTimeout(() => {
+            router.replace("/submit");
+          }, 1000);
+          return;
+        }
+        
+        // If not verified, check if email is a school domain
+        const email = user.primaryEmailAddress?.emailAddress || "";
+        if (isSchoolEmail(email)) {
+          // Auto-verify
+          const autoRole = email.includes("teacher") ? "teacher" : "student";
+          await setUserProfile(userId, {
+            eduVerified: true,
+            verified: true,
+            role: autoRole,
+            schoolEmail: email,
+            updatedAt: new Date().toISOString(),
+          });
+          setRedirecting(true);
+          setTimeout(() => {
+            router.replace("/submit");
+          }, 1000);
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking profile:", error);
+        setError("Failed to check verification status. Please try again.");
+      } finally {
+        setCheckingProfile(false);
       }
-      // If not verified, check if email is a school domain
-      const email = user.primaryEmailAddress?.emailAddress || "";
-      if (isSchoolEmail(email)) {
-        // Auto-verify
-        const autoRole = email.includes("teacher") ? "teacher" : "student";
-        await setUserProfile(userId, {
-          eduVerified: true,
-          verified: true,
-          role: autoRole,
-          schoolEmail: email,
-          updatedAt: new Date().toISOString(),
-        });
-        router.replace("/submit");
-        return;
-      }
-      setCheckingProfile(false);
     }
+    
     checkAndAutoVerify();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, userId, user]);
+  }, [isLoaded, userId, user, router]);
 
   useEffect(() => {
     if (user && (mode === "sheerid" || mode === "idme")) {
@@ -153,7 +169,25 @@ export default function VerifyPage() {
   if (!isLoaded || !userId || checkingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 to-white">
-        <Loader2 className="animate-spin h-10 w-10 text-yellow-600" />
+        <div className="text-center">
+          <Loader2 className="animate-spin h-10 w-10 text-yellow-600 mx-auto mb-4" />
+          <p className="text-gray-600">
+            {!isLoaded ? "Loading..." : checkingProfile ? "Checking verification status..." : "Loading user data..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show redirecting state
+  if (redirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 to-white">
+        <div className="text-center">
+          <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-green-600 mb-2">Already Verified!</h2>
+          <p className="text-gray-600">Redirecting to submit page...</p>
+        </div>
       </div>
     );
   }
@@ -206,53 +240,6 @@ export default function VerifyPage() {
               🔎 Test Firestore Write
             </button>
             {testWriteResult && <div className="mt-2 text-sm text-center text-red-600">{testWriteResult}</div>}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Step 1: Choose method
-  if (!mode) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-yellow-50 to-white px-4">
-        <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-2xl p-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-yellow-600 mb-2 text-center flex items-center justify-center gap-2">
-            <ShieldCheck className="h-7 w-7 text-yellow-500" />
-            Verify Your Status
-          </h1>
-          <p className="text-gray-600 mb-6 text-center">
-            To post reviews, you must verify you are a student or teacher.<br />
-            Choose a verification method:
-          </p>
-          <div className="flex flex-col gap-4">
-            <button
-              className="flex items-center gap-3 w-full bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold py-3 px-4 rounded-lg transition-colors border border-yellow-200 shadow-sm"
-              onClick={() => setMode("code")}
-            >
-              <CheckCircle className="h-5 w-5 text-yellow-600" />
-              Use School Invite Code
-            </button>
-            <button
-              className="flex items-center gap-3 w-full bg-blue-100 hover:bg-blue-200 text-blue-900 font-semibold py-3 px-4 rounded-lg transition-colors border border-blue-200 shadow-sm"
-              onClick={() => setMode("sheerid")}
-            >
-              <UserCheck className="h-5 w-5 text-blue-600" />
-              Verify with SheerID
-            </button>
-            <button
-              className="flex items-center gap-3 w-full bg-green-100 hover:bg-green-200 text-green-900 font-semibold py-3 px-4 rounded-lg transition-colors border border-green-200 shadow-sm"
-              onClick={() => setMode("idme")}
-            >
-              <UserCheck className="h-5 w-5 text-green-600" />
-              Verify with ID.me
-            </button>
-            <button
-              className="w-full mt-2 text-gray-500 hover:text-gray-700 text-sm underline"
-              onClick={() => router.push("/browse")}
-            >
-              Verify Later
-            </button>
           </div>
         </div>
       </div>
@@ -320,35 +307,50 @@ export default function VerifyPage() {
     );
   }
 
-  // Step 2: SheerID/ID.me mock
-  if (mode === "sheerid" || mode === "idme") {
+  // Step 3: Role selection for SheerID/ID.me
+  if ((mode === "sheerid" || mode === "idme") && !role) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-yellow-50 to-white px-4">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-2xl p-8 animate-fade-in">
           <button className="text-xs text-gray-400 mb-2" onClick={() => setMode(null)}>&larr; Back</button>
-          <h2 className="text-2xl font-bold text-blue-600 mb-2 text-center flex items-center gap-2">
-            <UserCheck className="h-6 w-6 text-blue-500" />
-            {mode === "sheerid" ? "SheerID" : "ID.me"} Verification
+          <h2 className="text-2xl font-bold text-blue-600 mb-2 text-center">Select Your Role</h2>
+          <p className="text-gray-600 mb-6 text-center">
+            Are you a student or teacher?
+          </p>
+          <div className="flex flex-col gap-4">
+            <button
+              className="flex items-center gap-3 w-full bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-3 px-4 rounded-lg transition-colors border border-blue-200 shadow-sm"
+              onClick={() => setRole("student")}
+            >
+              <UserCheck className="h-5 w-5 text-blue-600" />
+              I'm a Student
+            </button>
+            <button
+              className="flex items-center gap-3 w-full bg-green-100 hover:bg-green-200 text-green-800 font-semibold py-3 px-4 rounded-lg transition-colors border border-green-200 shadow-sm"
+              onClick={() => setRole("teacher")}
+            >
+              <UserCheck className="h-5 w-5 text-green-600" />
+              I'm a Teacher
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Step 4: Email verification for SheerID/ID.me
+  if ((mode === "sheerid" || mode === "idme") && role) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-yellow-50 to-white px-4">
+        <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-2xl p-8 animate-fade-in">
+          <button className="text-xs text-gray-400 mb-2" onClick={() => setRole(null)}>&larr; Back</button>
+          <h2 className="text-2xl font-bold text-blue-600 mb-2 text-center">
+            {mode === "sheerid" ? "Verify with SheerID" : "Verify with ID.me"}
           </h2>
-          {!role ? (
-            <>
-              <p className="text-gray-600 mb-4 text-center">Select your role to continue:</p>
-              <div className="flex gap-4 justify-center mb-4">
-                <button
-                  className="flex-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold py-2 px-4 rounded-lg border border-yellow-200 shadow-sm"
-                  onClick={() => setRole("student")}
-                >
-                  Student
-                </button>
-                <button
-                  className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-2 px-4 rounded-lg border border-blue-200 shadow-sm"
-                  onClick={() => setRole("teacher")}
-                >
-                  Teacher
-                </button>
-              </div>
-            </>
-          ) : !success ? (
+          <p className="text-gray-600 mb-6 text-center">
+            Enter your school email address to verify your {role} status.
+          </p>
+          {!success ? (
             <form
               className="flex flex-col gap-4"
               onSubmit={async (e) => {

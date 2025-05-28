@@ -4,7 +4,7 @@ import { getProductReviews, addReview, getProduct, updateProduct } from '@/lib/f
 import { Product, Review } from '@/lib/types';
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(request: Request) {

@@ -3,6 +3,7 @@ import { getProductReviews, addReview, getProduct, createProduct, getUserProfile
 import { adminDb } from '@/lib/firebase-admin';
 import * as admin from 'firebase-admin';
 import OpenAI from 'openai';
+import { Review } from '@/lib/types';
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 1 minute
@@ -98,8 +99,115 @@ function validateReviewData(data: any): { isValid: boolean; error?: string } {
   return { isValid: true };
 }
 
+// Initialize OpenAI client for content moderation
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Helper function to check if content is safe using OpenAI moderation
+async function isContentSafe(text: string): Promise<boolean> {
+  try {
+    const moderation = await openai.moderations.create({
+      input: text,
+    });
+    
+    const result = moderation.results[0];
+    return !result.flagged;
+  } catch (error) {
+    console.error('Error checking content safety:', error);
+    // If moderation fails, err on the side of caution and flag as unsafe
+    return false;
+  }
+}
+
+// Helper function to generate AI summary for reviews
+async function generateAISummary(reviews: Review[]): Promise<string> {
+  if (reviews.length === 0) {
+    return "No reviews available for this product yet.";
+  }
+
+  try {
+    const reviewTexts = reviews
+      .filter(review => review.safe !== false) // Only include safe reviews
+      .map(review => `Rating: ${review.stars}/5 - ${review.review}`)
+      .join('\n\n');
+
+    if (!reviewTexts.trim()) {
+      return "No safe reviews available for this product yet.";
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that summarizes product reviews. Create a concise, balanced summary that highlights the main themes and sentiments from the reviews. Keep it under 200 words."
+        },
+        {
+          role: "user",
+          content: `Please summarize these product reviews:\n\n${reviewTexts}`
+        }
+      ],
+      max_tokens: 300,
+      temperature: 0.7,
+    });
+
+    return completion.choices[0]?.message?.content || "Unable to generate summary at this time.";
+  } catch (error) {
+    console.error('Error generating AI summary:', error);
+    return "Unable to generate summary at this time.";
+  }
+}
+
+// Helper function to extract themes from reviews
+async function extractThemes(reviews: Review[]): Promise<{ theme1: string; theme2: string; theme3: string; theme4: string }> {
+  if (reviews.length === 0) {
+    return { theme1: "", theme2: "", theme3: "", theme4: "" };
+  }
+
+  try {
+    const reviewTexts = reviews
+      .filter(review => review.safe !== false) // Only include safe reviews
+      .map(review => review.review)
+      .join('\n\n');
+
+    if (!reviewTexts.trim()) {
+      return { theme1: "", theme2: "", theme3: "", theme4: "" };
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that identifies key themes from product reviews. Extract exactly 4 main themes or topics that users frequently mention. Return them as short phrases (2-4 words each), separated by newlines. If there are fewer than 4 distinct themes, return empty strings for the remaining ones."
+        },
+        {
+          role: "user",
+          content: `Extract 4 key themes from these reviews:\n\n${reviewTexts}`
+        }
+      ],
+      max_tokens: 100,
+      temperature: 0.3,
+    });
+
+    const themes = completion.choices[0]?.message?.content?.split('\n').filter(t => t.trim()) || [];
+    
+    return {
+      theme1: themes[0]?.trim() || "",
+      theme2: themes[1]?.trim() || "",
+      theme3: themes[2]?.trim() || "",
+      theme4: themes[3]?.trim() || "",
+    };
+  } catch (error) {
+    console.error('Error extracting themes:', error);
+    return { theme1: "", theme2: "", theme3: "", theme4: "" };
+  }
+}
+
+// Initialize OpenAI client
+const openaiClient = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function GET(
