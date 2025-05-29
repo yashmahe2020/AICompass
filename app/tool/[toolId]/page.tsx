@@ -57,11 +57,15 @@ export default function ToolPage({
         }
         
         const reviewsData = await reviewsResponse.json();
-        setReviews(reviewsData);
+        // Sort reviews by date in descending order (newest first) as a fallback
+        const sortedReviews = reviewsData.sort((a: Review, b: Review) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+        setReviews(sortedReviews);
         
         // Calculate average rating
-        if (reviewsData.length > 0) {
-          const avg = reviewsData.reduce((sum: number, review: Review) => sum + review.stars, 0) / reviewsData.length;
+        if (sortedReviews.length > 0) {
+          const avg = sortedReviews.reduce((sum: number, review: Review) => sum + review.stars, 0) / sortedReviews.length;
           setAverageRating(avg);
         }
         

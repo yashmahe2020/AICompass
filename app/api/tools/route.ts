@@ -8,17 +8,28 @@ export async function GET() {
     // Calculate average rating for each product
     const productsWithRatings = await Promise.all(
       products.map(async ({ id, product }) => {
-        const reviews = await getProductReviews(id);
-        const averageRating = reviews.length > 0
-          ? reviews.reduce((sum, review) => sum + review.stars, 0) / reviews.length
-          : 0;
-        
-        return {
-          id,
-          name: product.name,
-          reviewCount: product.reviewCount || 0,
-          averageRating
-        };
+        try {
+          const reviews = await getProductReviews(id);
+          const averageRating = reviews.length > 0
+            ? reviews.reduce((sum, review) => sum + review.stars, 0) / reviews.length
+            : 0;
+          
+          return {
+            id,
+            name: product.name,
+            reviewCount: reviews.length, // Use actual review count from fetched reviews
+            averageRating
+          };
+        } catch (reviewError) {
+          console.error(`Error fetching reviews for product ${id}:`, reviewError);
+          // Return product with zero ratings if review fetching fails
+          return {
+            id,
+            name: product.name,
+            reviewCount: 0,
+            averageRating: 0
+          };
+        }
       })
     );
     

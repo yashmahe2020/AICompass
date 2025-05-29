@@ -1,6 +1,6 @@
 import { db } from './firebase';
 import { adminDb } from './firebase-admin';
-import { collection, doc, getDocs, setDoc, query, where, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, query, where, getDoc, updateDoc, increment, orderBy } from 'firebase/firestore';
 import { Product, Review } from './types';
 import OpenAI from 'openai';
 import * as admin from 'firebase-admin';
@@ -56,26 +56,79 @@ export async function createProduct(productId: string, product: Product): Promis
 export async function getProductReviews(productId: string, options?: { includeUnsafe?: boolean }): Promise<Review[]> {
   try {
     if (isServer()) {
-      let queryRef = adminDb.collection('reviews').where('productId', '==', productId);
-      if (!options?.includeUnsafe) {
-        queryRef = queryRef.where('safe', 'in', [true, null]);
+      // Try with ordering first, fall back to basic query if index doesn't exist
+      try {
+        let queryRef = adminDb.collection('reviews')
+          .where('productId', '==', productId);
+        
+        if (!options?.includeUnsafe) {
+          queryRef = queryRef.where('safe', 'in', [true, null]);
+        }
+        
+        // Try to add ordering - this might fail if index doesn't exist
+        queryRef = queryRef.orderBy('date', 'desc');
+        
+        const reviewsSnapshot = await queryRef.get();
+        return reviewsSnapshot.docs.map(doc => doc.data() as Review);
+      } catch (indexError) {
+        console.log('Falling back to basic query due to missing index:', indexError);
+        // Fall back to basic query without ordering
+        let queryRef = adminDb.collection('reviews')
+          .where('productId', '==', productId);
+        
+        if (!options?.includeUnsafe) {
+          queryRef = queryRef.where('safe', 'in', [true, null]);
+        }
+        
+        const reviewsSnapshot = await queryRef.get();
+        const reviews = reviewsSnapshot.docs.map(doc => doc.data() as Review);
+        
+        // Sort client-side as fallback
+        return reviews.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       }
-      const reviewsSnapshot = await queryRef.get();
-      return reviewsSnapshot.docs.map(doc => doc.data() as Review);
     } else {
-      let reviewsQuery = query(
-        collection(db, 'reviews'),
-        where('productId', '==', productId)
-      );
-      if (!options?.includeUnsafe) {
-        reviewsQuery = query(
+      // Try with ordering first, fall back to basic query if index doesn't exist
+      try {
+        let reviewsQuery = query(
           collection(db, 'reviews'),
-          where('productId', '==', productId),
-          where('safe', 'in', [true, null])
+          where('productId', '==', productId)
         );
+        
+        if (!options?.includeUnsafe) {
+          reviewsQuery = query(
+            collection(db, 'reviews'),
+            where('productId', '==', productId),
+            where('safe', 'in', [true, null])
+          );
+        }
+        
+        // Try to add ordering - this might fail if index doesn't exist
+        reviewsQuery = query(reviewsQuery, orderBy('date', 'desc'));
+        
+        const querySnapshot = await getDocs(reviewsQuery);
+        return querySnapshot.docs.map(doc => doc.data() as Review);
+      } catch (indexError) {
+        console.log('Falling back to basic query due to missing index:', indexError);
+        // Fall back to basic query without ordering
+        let reviewsQuery = query(
+          collection(db, 'reviews'),
+          where('productId', '==', productId)
+        );
+        
+        if (!options?.includeUnsafe) {
+          reviewsQuery = query(
+            collection(db, 'reviews'),
+            where('productId', '==', productId),
+            where('safe', 'in', [true, null])
+          );
+        }
+        
+        const querySnapshot = await getDocs(reviewsQuery);
+        const reviews = querySnapshot.docs.map(doc => doc.data() as Review);
+        
+        // Sort client-side as fallback
+        return reviews.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       }
-      const querySnapshot = await getDocs(reviewsQuery);
-      return querySnapshot.docs.map(doc => doc.data() as Review);
     }
   } catch (error) {
     console.error('Error getting reviews:', error);

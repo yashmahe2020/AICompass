@@ -47,7 +47,27 @@ A Next.js application that provides AI-generated summaries of product reviews.
    - Save the JSON file
    - Convert the JSON to a string and add it to your environment variables as `FIREBASE_SERVICE_ACCOUNT`
 
-5. Set up Firestore security rules to allow authenticated access:
+5. **Firestore Indexes (Important)**:
+   The app requires a composite index for optimal review ordering. When you first deploy, you may see an error like:
+   ```
+   The query requires an index. You can create it here: https://console.firebase.google.com/...
+   ```
+   
+   **Don't worry!** The app has a fallback mechanism that will:
+   - Catch the missing index error
+   - Fall back to a basic query without ordering
+   - Sort reviews client-side to show newest first
+   
+   To create the required index:
+   - Click the link in the error message, or
+   - Go to Firestore > Indexes in your Firebase console
+   - Create a composite index for the `reviews` collection with fields:
+     - `productId` (Ascending)
+     - `safe` (Ascending) 
+     - `date` (Descending)
+     - `__name__` (Ascending)
+
+6. Set up Firestore security rules to allow authenticated access:
    ```
    rules_version = '2';
    service cloud.firestore {

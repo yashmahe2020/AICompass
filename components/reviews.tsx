@@ -23,9 +23,14 @@ function DisplayRating({ rating }: { rating: number }) {
 }
 
 export function Reviews({ product, reviews }: { product: Product; reviews: ReviewType[] }) {
+  // Sort reviews by date in descending order (newest first)
+  const sortedReviews = [...reviews].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+  
   // Calculate average rating
-  const averageRating = reviews.length > 0
-    ? reviews.reduce((sum, review) => sum + review.stars, 0) / reviews.length
+  const averageRating = sortedReviews.length > 0
+    ? sortedReviews.reduce((sum, review) => sum + review.stars, 0) / sortedReviews.length
     : 0;
 
   return (
@@ -41,20 +46,20 @@ export function Reviews({ product, reviews }: { product: Product; reviews: Revie
           </div>
         </div>
         <p className="text-gray-600">
-          Based on {reviews.length} reviews
+          Based on {sortedReviews.length} reviews
         </p>
       </div>
 
       <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
         <h2 className="text-2xl font-semibold mb-4 text-gray-900">AI Summary</h2>
-        <AIReviewSummary reviews={reviews} />
+        <AIReviewSummary reviews={sortedReviews} />
       </div>
 
       <div>
         <h2 className="text-2xl font-semibold mb-6 text-gray-900">User Reviews</h2>
         <div className="space-y-6">
-          {reviews.length > 0 ? (
-            reviews.map((review, index) => (
+          {sortedReviews.length > 0 ? (
+            sortedReviews.map((review, index) => (
               <div key={index} className="border-b border-gray-200 pb-6">
                 <div className="flex items-center justify-between mb-2">
                   <div>
